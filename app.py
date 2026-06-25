@@ -1,4 +1,5 @@
 """Main TUI Application — Textual-based file manager with AI."""
+import asyncio
 import os
 from pathlib import Path
 from textual.app import App, ComposeResult
@@ -145,13 +146,13 @@ class FileManagerApp(App):
             self._show_ai(result)
             dest_panel.load_files()
 
-    def action_ai_rename(self):
+    async def action_ai_rename(self):
         panel = self.query_one(f"#{self.active_panel}-panel")
         selected = panel.selected_file()
         if selected:
             self._show_ai(f"[bold]AI анализ: {selected.name}[/]")
             try:
-                suggestion = suggest_rename(selected)
+                suggestion = await asyncio.to_thread(suggest_rename, selected)
                 self._show_ai(f"AI предлагает:\n{suggestion}")
             except Exception as e:
                 self._show_ai(f"[red]AI error: {e}[/]")
@@ -161,20 +162,20 @@ class FileManagerApp(App):
         input_w.placeholder = "Опишите что ищете..."
         input_w.focus()
 
-    def action_ai_organize(self):
+    async def action_ai_organize(self):
         panel = self.query_one(f"#{self.active_panel}-panel")
         self._show_ai("[bold]AI анализирует структуру...[/]")
         try:
-            suggestion = organize_suggestion(panel.current_path)
+            suggestion = await asyncio.to_thread(organize_suggestion, panel.current_path)
             self._show_ai(f"AI предлагает организовать:\n{suggestion}")
         except Exception as e:
             self._show_ai(f"[red]AI error: {e}[/]")
 
-    def action_ai_summary(self):
+    async def action_ai_summary(self):
         panel = self.query_one(f"#{self.active_panel}-panel")
         self._show_ai("[bold]AI анализирует папку...[/]")
         try:
-            summary = summarize_directory(panel.current_path)
+            summary = await asyncio.to_thread(summarize_directory, panel.current_path)
             self._show_ai(f"AI описание:\n{summary}")
         except Exception as e:
             self._show_ai(f"[red]AI error: {e}[/]")
@@ -189,7 +190,7 @@ class FileManagerApp(App):
         else:
             self._show_ai("✅ Дубликатов не найдено")
 
-    def on_input_submitted(self, event: Input.Submitted):
+    async def on_input_submitted(self, event: Input.Submitted):
         command = event.value.strip()
         if not command:
             return
@@ -200,8 +201,8 @@ class FileManagerApp(App):
         if command.startswith("ai "):
             self._show_ai("[bold]AI думает...[/]")
             try:
-                context = scan_directory(panel.current_path)
-                response = ask_ai(command[3:], context)
+                context = await asyncio.to_thread(scan_directory, panel.current_path)
+                response = await asyncio.to_thread(ask_ai, command[3:], context)
                 self._show_ai(f"🤖 {response}")
             except Exception as e:
                 self._show_ai(f"[red]AI error: {e}[/]")
