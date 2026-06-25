@@ -149,9 +149,12 @@ class FileManagerApp(App):
         panel = self.query_one(f"#{self.active_panel}-panel")
         selected = panel.selected_file()
         if selected:
-            self._show_ai(f"[bold]AI分析: {selected.name}[/]")
-            suggestion = suggest_rename(selected)
-            self._show_ai(f"AI предлагает:\n{suggestion}")
+            self._show_ai(f"[bold]AI анализ: {selected.name}[/]")
+            try:
+                suggestion = suggest_rename(selected)
+                self._show_ai(f"AI предлагает:\n{suggestion}")
+            except Exception as e:
+                self._show_ai(f"[red]AI error: {e}[/]")
 
     def action_ai_find(self):
         input_w = self.query_one("#command-input")
@@ -161,14 +164,20 @@ class FileManagerApp(App):
     def action_ai_organize(self):
         panel = self.query_one(f"#{self.active_panel}-panel")
         self._show_ai("[bold]AI анализирует структуру...[/]")
-        suggestion = organize_suggestion(panel.current_path)
-        self._show_ai(f"AI предлагает организовать:\n{suggestion}")
+        try:
+            suggestion = organize_suggestion(panel.current_path)
+            self._show_ai(f"AI предлагает организовать:\n{suggestion}")
+        except Exception as e:
+            self._show_ai(f"[red]AI error: {e}[/]")
 
     def action_ai_summary(self):
         panel = self.query_one(f"#{self.active_panel}-panel")
         self._show_ai("[bold]AI анализирует папку...[/]")
-        summary = summarize_directory(panel.current_path)
-        self._show_ai(f"AI описание:\n{summary}")
+        try:
+            summary = summarize_directory(panel.current_path)
+            self._show_ai(f"AI описание:\n{summary}")
+        except Exception as e:
+            self._show_ai(f"[red]AI error: {e}[/]")
 
     def action_duplicates(self):
         panel = self.query_one(f"#{self.active_panel}-panel")
@@ -189,10 +198,13 @@ class FileManagerApp(App):
         panel = self.query_one(f"#{self.active_panel}-panel")
 
         if command.startswith("ai "):
-            self._show_ai(f"[bold]AI думает...[/]")
-            context = scan_directory(panel.current_path)
-            response = ask_ai(command[3:], context)
-            self._show_ai(f"🤖 {response}")
+            self._show_ai("[bold]AI думает...[/]")
+            try:
+                context = scan_directory(panel.current_path)
+                response = ask_ai(command[3:], context)
+                self._show_ai(f"🤖 {response}")
+            except Exception as e:
+                self._show_ai(f"[red]AI error: {e}[/]")
 
         elif command.startswith("cd "):
             path = command[3:].strip()
@@ -224,7 +236,13 @@ class FileManagerApp(App):
             days = int(command[4:].strip()) if command[4:].strip().isdigit() else 30
             old = find_old_files(panel.current_path, days)
             if old:
-                lines = [f"📅 {f.name} ({f.stat().st_mtime:.0f})" for f in old[:15]]
+                lines = []
+                for f in old[:15]:
+                    try:
+                        mtime = f.stat().st_mtime
+                        lines.append(f"  {f.name} ({mtime:.0f})")
+                    except Exception:
+                        lines.append(f"  {f.name} (access error)")
                 self._show_ai(f"Старые файлы (>{days} дней): {len(old)}\n" + "\n".join(lines))
             else:
                 self._show_ai(f"✅ Нет файлов старше {days} дней")
