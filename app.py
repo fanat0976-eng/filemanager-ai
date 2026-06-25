@@ -12,8 +12,8 @@ from operations import safe_delete, safe_rename, safe_copy, safe_move, create_di
 class FilePanel(Static):
     """Single file panel (left or right)."""
 
-    def __init__(self, path: str = ".", name: str = "left"):
-        super().__init__(name=name)
+    def __init__(self, path: str = ".", name: str = "left", id: str = None):
+        super().__init__(name=name, id=id)
         self.current_path = Path(path).resolve()
         self.files: list[Path] = []
 
@@ -87,8 +87,8 @@ class FileManagerApp(App):
     def compose(self) -> ComposeResult:
         yield Header()
         with Horizontal():
-            yield FilePanel(".", "left")
-            yield FilePanel(".", "right")
+            yield FilePanel(".", "left", id="left-panel")
+            yield FilePanel(".", "right", id="right-panel")
         yield Input(placeholder="Command (cd, mkdir, ai...) or prompt...", id="command-input")
         yield Static("[bold green]AI Output:[/] Ready", id="ai-output")
         yield Footer()
