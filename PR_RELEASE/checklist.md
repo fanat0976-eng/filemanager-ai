@@ -54,4 +54,5 @@
 
 ## Post-Merge
 - [x] GitHub Release v0.1.0 created
-- [ ] Add CI/CD
+- [x] Add CI/CD
+- [x] Async AI commands

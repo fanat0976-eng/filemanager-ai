@@ -1,5 +1,4 @@
 """File Operations — safe file operations with confirmation."""
-import os
 import shutil
 from pathlib import Path
 from datetime import datetime, timedelta

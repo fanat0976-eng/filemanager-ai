@@ -1,5 +1,4 @@
 """AI Integration — Ollama-powered file operations."""
-import json
 import httpx
 from pathlib import Path
 
@@ -50,7 +49,7 @@ def scan_directory(path: Path, max_files: int = 50) -> str:
             lines.append(f"  📄 {entry.name} ({size}B)")
         count += 1
     if count >= max_files:
-        lines.append(f"  ... and more")
+        lines.append("  ... and more")
     return "\n".join(lines)
 
 

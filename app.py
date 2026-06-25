@@ -1,13 +1,12 @@
 """Main TUI Application — Textual-based file manager with AI."""
 import asyncio
-import os
 from pathlib import Path
 from textual.app import App, ComposeResult
 from textual.widgets import Header, Footer, Static, Input, DataTable
 from textual.binding import Binding
 from textual.containers import Horizontal
-from ai import ask_ai, scan_directory, suggest_rename, find_files_by_description, organize_suggestion, summarize_directory
-from operations import safe_delete, safe_rename, safe_copy, safe_move, create_dir, find_duplicates, find_old_files, file_stats
+from ai import ask_ai, scan_directory, suggest_rename, organize_suggestion, summarize_directory
+from operations import safe_delete, safe_copy, create_dir, find_duplicates, find_old_files, file_stats
 
 
 class FilePanel(Static):
@@ -249,7 +248,7 @@ class FileManagerApp(App):
                 self._show_ai(f"✅ Нет файлов старше {days} дней")
 
         else:
-            self._show_ai(f"[yellow]Команды: cd, mkdir, stats, old, ai <prompt>[/]")
+            self._show_ai("[yellow]Команды: cd, mkdir, stats, old, ai <prompt>[/]")
 
     def _show_ai(self, text: str):
         self.query_one("#ai-output").update(text)
