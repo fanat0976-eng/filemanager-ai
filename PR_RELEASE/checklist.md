@@ -51,3 +51,7 @@
 - [x] All tests pass
 - [x] No critical bugs
 - [x] Documentation complete
+
+## Post-Merge
+- [x] GitHub Release v0.1.0 created
+- [ ] Add CI/CD
